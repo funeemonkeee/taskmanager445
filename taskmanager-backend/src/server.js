@@ -7,6 +7,13 @@ const mysql = require('mysql2/promise');
 const verifyToken = require('./auth');
 
 require('dotenv').config();
+
+const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
+
+const region = process.env.COGNITO_REGION;
+const userPoolId = process.env.COGNITO_USER_POOL_ID;
+const clientId = process.env.COGNITO_CLIENT_ID;
 console.log("ENV CHECK:", process.env.COGNITO_REGION, process.env.COGNITO_USER_POOL_ID, process.env.COGNITO_CLIENT_ID);
 
 

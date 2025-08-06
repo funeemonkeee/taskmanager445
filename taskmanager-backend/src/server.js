@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
@@ -18,9 +19,13 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'CSIS445 Assignment 1 – Task Manager App',
     },
-    servers: [{ url: 'http://localhost:3000' }],
+    servers: [
+      {
+        url: process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`,
+      }
+    ],
   },
-  apis: ['./src/server.js']
+  apis: ['./src/server.js'] // path to your API docs
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
@@ -58,39 +63,22 @@ app.get('/tasks', (req, res) => {
  * /tasks:
  *   post:
  *     summary: Create a new task
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               dueDate:
- *                 type: string
- *               priority:
- *                 type: string
- *               completed:
- *                 type: boolean
  *     responses:
  *       201:
  *         description: Task created
  */
 app.post('/tasks', (req, res) => {
-  const task = {
-    id: Date.now(),
+  const newTask = {
+    id: tasks.length + 1,
     title: req.body.title,
     description: req.body.description,
     dueDate: req.body.dueDate,
     priority: req.body.priority,
-    completed: req.body.completed,
-    createdAt: new Date().toISOString()
+    completed: req.body.completed || false,
+    createdAt: new Date()
   };
-  tasks.push(task);
-  res.status(201).json(task);
+  tasks.push(newTask);
+  res.status(201).json(newTask);
 });
 
 /**
@@ -105,23 +93,6 @@ app.post('/tasks', (req, res) => {
  *           type: integer
  *         required: true
  *         description: Task ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               dueDate:
- *                 type: string
- *               priority:
- *                 type: string
- *               completed:
- *                 type: boolean
  *     responses:
  *       200:
  *         description: Task updated
@@ -133,15 +104,10 @@ app.put('/tasks/:id', (req, res) => {
   const task = tasks.find(t => t.id === taskId);
 
   if (!task) {
-    return res.status(404).json({ error: 'Task does not exist' });
+    return res.status(404).json({ error: 'Task not found' });
   }
 
-  if (req.body.title !== undefined) task.title = req.body.title;
-  if (req.body.description !== undefined) task.description = req.body.description;
-  if (req.body.dueDate !== undefined) task.dueDate = req.body.dueDate;
-  if (req.body.priority !== undefined) task.priority = req.body.priority;
-  if (req.body.completed !== undefined) task.completed = !!req.body.completed;
-
+  Object.assign(task, req.body);
   res.json(task);
 });
 
@@ -175,7 +141,7 @@ app.delete('/tasks/:id', (req, res) => {
   res.status(204).send();
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
   console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`);

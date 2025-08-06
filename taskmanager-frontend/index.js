@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearBtn = document.getElementById('RemoveB');
     const taskList = document.getElementById('taskList');
 
+    // ✅ Works locally and on EC2 without editing
+    const API_BASE_URL = window.location.hostname === 'localhost'
+        ? 'http://localhost:3000'
+        : '';
+
+    const apiFetch = (path, options) => fetch(`${API_BASE_URL}${path}`, options);
+
     let tasks = [];
     let editingTaskId = null;
 
@@ -27,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         if (editingTaskId !== null) {
-            fetch(`http://localhost:3000/tasks/${editingTaskId}`, {
+            apiFetch(`/tasks/${editingTaskId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(taskData)
@@ -41,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearForm();
             });
         } else {
-            fetch('http://localhost:3000/tasks', {
+            apiFetch('/tasks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(taskData)
@@ -61,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     clearBtn.addEventListener('click', clearForm);
 
     function fetchTasks() {
-        fetch('http://localhost:3000/tasks')
+        apiFetch('/tasks')
             .then(res => res.json())
             .then(data => {
                 console.log("Connected to backend yay!, Tasks: ", data)
@@ -101,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const taskId = parseInt(e.target.closest('.delete-btn').dataset.id);
-                fetch(`http://localhost:3000/tasks/${taskId}`, { method: 'DELETE' })
+                apiFetch(`/tasks/${taskId}`, { method: 'DELETE' })
                     .then(() => {
                         tasks = tasks.filter(t => t.id !== taskId);
                         saveAndRender();
@@ -130,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const taskId = parseInt(e.target.dataset.id);
                 const task = tasks.find(t => t.id === taskId);
                 task.completed = e.target.checked;
-                fetch(`http://localhost:3000/tasks/${taskId}`, {
+                apiFetch(`/tasks/${taskId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(task)
@@ -156,6 +163,5 @@ document.addEventListener('DOMContentLoaded', function() {
         prioritySelect.value = 'none';
         editingTaskId = null;
         addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Task';
-        titleInput.focus();
     }
 });

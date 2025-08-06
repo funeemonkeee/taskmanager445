@@ -15,6 +15,8 @@ const pool = mysql.createPool({
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
+
 
 // Swagger setup
 const swaggerOptions = {
@@ -43,9 +45,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *       200:
  *         description: Backend is running
  */
-app.get('/', (req, res) => {
-  res.send('Hello, backend is working for CSIS445 assignment 1');
-});
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 /**
  * @swagger

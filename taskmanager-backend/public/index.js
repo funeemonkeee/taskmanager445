@@ -7,12 +7,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearBtn = document.getElementById('RemoveB');
     const taskList = document.getElementById('taskList');
 
-    // ✅ Works locally and on EC2 without editing
+    // Works locally and on EC2 without editing
     const API_BASE_URL = window.location.hostname === 'localhost'
         ? 'http://localhost:3000'
         : '';
 
-    const apiFetch = (path, options) => fetch(`${API_BASE_URL}${path}`, options);
+    const apiFetch = (path, options = {}) => {
+    const token = localStorage.getItem('access_token');
+    const headers = {
+        ...(options.headers || {}),
+        Authorization: token ? `Bearer ${token}` : undefined,
+        'Content-Type': 'application/json'
+    };
+    return fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+};
+
 
     let tasks = [];
     let editingTaskId = null;

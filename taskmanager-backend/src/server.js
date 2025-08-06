@@ -8,12 +8,7 @@ const verifyToken = require('./auth');
 
 require('dotenv').config();
 
-const jwt = require('jsonwebtoken');
-const jwksClient = require('jwks-rsa');
 
-const region = process.env.COGNITO_REGION;
-const userPoolId = process.env.COGNITO_USER_POOL_ID;
-const clientId = process.env.COGNITO_CLIENT_ID;
 console.log("ENV CHECK:", process.env.COGNITO_REGION, process.env.COGNITO_USER_POOL_ID, process.env.COGNITO_CLIENT_ID);
 
 
@@ -45,9 +40,9 @@ const swaggerOptions = {
     info: {
       title: 'Task Manager API',
       version: '1.0.0',
-      description: 'CSIS445 Assignment 1 – Task Manager App',
+      description: 'CSIS445 Assignment 2 – Task Manager App',
     },
-    servers: [{ url: 'http://localhost:3000' }],
+    servers: [{ url: 'https://dv99wmti0d91q.cloudfront.net' }],
   },
   apis: ['./src/server.js']
 };

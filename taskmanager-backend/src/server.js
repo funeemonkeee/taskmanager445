@@ -17,7 +17,7 @@ const pool = mysql.createPool({
 
 const corsOptions = {
   origin: [
-    'https://d84l1y8p4kdic.cloudfront.net' 
+    'https://dv99wmti0d91q.cloudfront.net' 
   ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true

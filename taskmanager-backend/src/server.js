@@ -4,6 +4,8 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
+const verifyToken = require('./auth');
+
 require('dotenv').config();
 
 const pool = mysql.createPool({
@@ -93,7 +95,7 @@ app.get('/tasks', async (req, res) => {
  *       201:
  *         description: Task created
  */
-app.post('/tasks', async (req, res) => {
+app.post('/tasks', verifyToken, async (req, res) => {
   try {
     const task = {
       title: req.body.title,
@@ -149,7 +151,7 @@ app.post('/tasks', async (req, res) => {
  *       404:
  *         description: Task not found
  */
-app.put('/tasks/:id', async (req, res) => {
+app.put('/tasks/:id', verifyToken, async (req, res) => {
   const taskId = Number(req.params.id);
   try {
     const [rows] = await pool.query('SELECT * FROM tasks WHERE id = ?', [taskId]);
@@ -195,7 +197,7 @@ app.put('/tasks/:id', async (req, res) => {
  *       404:
  *         description: Task not found
  */
-app.delete('/tasks/:id', async (req, res) => {
+app.delete('/tasks/:id', verifyToken, async (req, res) => {
   const taskId = Number(req.params.id);
   try {
     const [result] = await pool.query('DELETE FROM tasks WHERE id = ?', [taskId]);

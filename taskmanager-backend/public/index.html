@@ -9,6 +9,24 @@
 </head>
 
 <body>
+
+    <button id="loginBtn">Login</button>
+<button id="logoutBtn">Logout</button>
+
+<script>
+  const cognitoDomain = "https://ap-south-1j6kwvgfei.auth.ap-south-1.amazoncognito.com";
+  const clientId = "sc1l35q653i9odmh81a2ejje4";
+  const redirectUri = "https://dv99wmti0d91q.cloudfront.net"; // CloudFront URL
+
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    window.location.href = `${cognitoDomain}/login?client_id=${clientId}&response_type=code&scope=email+openid+profile&redirect_uri=${encodeURIComponent(redirectUri)}`;
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(redirectUri)}`;
+  });
+</script>
+
     <div class="top-section">
         <i class="fa-regular fa-user fa-3x"></i>
         <h1>Task Manager Pro</h1>

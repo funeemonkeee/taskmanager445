@@ -207,7 +207,7 @@ app.delete('/tasks/:id', async (req, res) => {
 });
 
 const PORT = 3000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running at http://localhost:${PORT}`);
   console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`);
 });

@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (editingTaskId !== null) {
             apiFetch(`/tasks/${editingTaskId}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(taskData)
             })
             .then(res => res.json())
@@ -59,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             apiFetch('/tasks', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(taskData)
             })
             .then(res => res.json())
@@ -148,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 task.completed = e.target.checked;
                 apiFetch(`/tasks/${taskId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(task)
                 })
                 .then(res => res.json())

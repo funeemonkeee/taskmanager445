@@ -3,8 +3,14 @@ const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const cors = require('cors');
+const mysql = require('mysql2/promise');
 
-let tasks = []; // In-memory database
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 
 app.use(cors());
 app.use(express.json());
@@ -49,8 +55,13 @@ app.get('/', (req, res) => {
  *       200:
  *         description: List of tasks
  */
-app.get('/tasks', (req, res) => {
-  res.json(tasks);
+app.get('/tasks', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM tasks');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
 });
 
 /**
@@ -79,18 +90,25 @@ app.get('/tasks', (req, res) => {
  *       201:
  *         description: Task created
  */
-app.post('/tasks', (req, res) => {
-  const task = {
-    id: Date.now(),
-    title: req.body.title,
-    description: req.body.description,
-    dueDate: req.body.dueDate,
-    priority: req.body.priority,
-    completed: req.body.completed,
-    createdAt: new Date().toISOString()
-  };
-  tasks.push(task);
-  res.status(201).json(task);
+app.post('/tasks', async (req, res) => {
+  try {
+    const task = {
+      title: req.body.title,
+      description: req.body.description,
+      dueDate: req.body.dueDate,
+      priority: req.body.priority,
+      completed: req.body.completed,
+      createdAt: new Date().toISOString(),
+    };
+    const [result] = await pool.query(
+      'INSERT INTO tasks (title, description, dueDate, priority, completed, createdAt) VALUES (?, ?, ?, ?, ?, ?)',
+      [task.title, task.description, task.dueDate, task.priority, task.completed, task.createdAt]
+    );
+    task.id = result.insertId;
+    res.status(201).json(task);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create task' });
+  }
 });
 
 /**
@@ -128,21 +146,32 @@ app.post('/tasks', (req, res) => {
  *       404:
  *         description: Task not found
  */
-app.put('/tasks/:id', (req, res) => {
+app.put('/tasks/:id', async (req, res) => {
   const taskId = Number(req.params.id);
-  const task = tasks.find(t => t.id === taskId);
+  try {
+    const [rows] = await pool.query('SELECT * FROM tasks WHERE id = ?', [taskId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Task does not exist' });
+    }
 
-  if (!task) {
-    return res.status(404).json({ error: 'Task does not exist' });
+    const task = rows[0];
+    const updated = {
+      title: req.body.title ?? task.title,
+      description: req.body.description ?? task.description,
+      dueDate: req.body.dueDate ?? task.dueDate,
+      priority: req.body.priority ?? task.priority,
+      completed: req.body.completed !== undefined ? req.body.completed : task.completed,
+    };
+
+    await pool.query(
+      'UPDATE tasks SET title = ?, description = ?, dueDate = ?, priority = ?, completed = ? WHERE id = ?',
+      [updated.title, updated.description, updated.dueDate, updated.priority, updated.completed, taskId]
+    );
+
+    res.json({ id: taskId, createdAt: task.createdAt, ...updated });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update task' });
   }
-
-  if (req.body.title !== undefined) task.title = req.body.title;
-  if (req.body.description !== undefined) task.description = req.body.description;
-  if (req.body.dueDate !== undefined) task.dueDate = req.body.dueDate;
-  if (req.body.priority !== undefined) task.priority = req.body.priority;
-  if (req.body.completed !== undefined) task.completed = !!req.body.completed;
-
-  res.json(task);
 });
 
 /**
@@ -163,16 +192,17 @@ app.put('/tasks/:id', (req, res) => {
  *       404:
  *         description: Task not found
  */
-app.delete('/tasks/:id', (req, res) => {
+app.delete('/tasks/:id', async (req, res) => {
   const taskId = Number(req.params.id);
-  const index = tasks.findIndex(t => t.id === taskId);
-
-  if (index === -1) {
-    return res.status(404).json({ error: 'Task does not exist' });
+  try {
+    const [result] = await pool.query('DELETE FROM tasks WHERE id = ?', [taskId]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Task does not exist' });
+    }
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete task' });
   }
-
-  tasks.splice(index, 1);
-  res.status(204).send();
 });
 
 const PORT = 3000;

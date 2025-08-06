@@ -4,6 +4,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
+require('dontenv').config();
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,

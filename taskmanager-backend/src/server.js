@@ -7,6 +7,8 @@ const mysql = require('mysql2/promise');
 const verifyToken = require('./auth');
 
 require('dotenv').config();
+console.log("ENV CHECK:", process.env.COGNITO_REGION, process.env.COGNITO_USER_POOL_ID, process.env.COGNITO_CLIENT_ID);
+
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,

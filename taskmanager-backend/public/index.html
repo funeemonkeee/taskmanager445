@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager Pro</title>
+    <link rel="stylesheet" href="Styles.css"> 
+    <script src="https://kit.fontawesome.com/7710cd6119.js" crossorigin="anonymous"></script>      
+</head>
+
+<body>
+    <div class="top-section">
+        <i class="fa-regular fa-user fa-3x"></i>
+        <h1>Task Manager Pro</h1>
+        <p>Your personal assistant</p>
+    </div>
+    
+    <div class="main-section">
+        <div class="left-section">
+            <div class="form-container">
+
+                <label for="userAnswer" id="title">Task Title <i class="fa-solid fa-heading"></i></label>
+                <input type="text" id="userAnswer" placeholder="Enter task title" required>
+    
+                <label for="userAnswer2" id="description">Description <i class="fa-regular fa-file"></i></label>
+                <textarea id="userAnswer2" placeholder="Enter task details" rows="3"></textarea>
+                
+                <label for="duedate" id="duedater">Due Date <i class="fa-solid fa-calendar"></i></label>
+                <input type="date" id="duedate">
+                
+                <label for="Pri" id="Prio">Priority Level<i class="fa-solid fa-skull" style="margin-left:6px;"></i></label> 
+                <select name="Prio" id="Pri">
+                    <option value="none">None</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="severe">Severe</option>
+                    <option value="GiveUp">Critical</option>
+                </select>
+                
+                <div class="button-container">
+                    <button id="SubmitB"><i class="fas fa-plus"></i> Add Task</button> 
+                    <button id="RemoveB"><i class="fas fa-eraser"></i> Clear Form</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <h2><i class="fas fa-tasks"></i> Task List</h2>
+            <ul id="taskList"></ul>
+        </div>
+    </div>
+    
+    <script src="index.js"></script>
+</body>    
+</html>

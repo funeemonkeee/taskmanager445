@@ -15,7 +15,16 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
 });
 
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'https://d84l1y8p4kdic.cloudfront.net' 
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(express.static('public'));
 
